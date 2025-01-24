@@ -1,3 +1,3 @@
-version: 1.0.0
+version: 1.1.0
 
-message: Base code. experimenting
+message: Groq API support added. now, user can add his/her groq api key and access to the LLM model.
