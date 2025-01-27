@@ -1,0 +1,12 @@
+
+# folder
+logs/
+*_vectores/
+
+# environments
+.env
+
+# files
+ideas.txt
+experiment.py
+*.pdf
