@@ -194,11 +194,11 @@ if root_work == "Text":
         if response and st.button("Speak Text"):
             Speak(response)
             
-        elif root_application_type == "Info Retrieved from document":
-            # call function and get response
-            response = text_retriever_document()
+    elif root_application_type == "Info Retrieved from document":
+        # call function and get response
+        response = text_retriever_document()
 
-            # write response
-            st.write(response)
+        # write response
+        st.write(response)
 else:
     st.write("Working in Progress :)")
