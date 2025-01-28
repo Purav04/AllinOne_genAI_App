@@ -10,3 +10,6 @@ logs/
 ideas.txt
 experiment.py
 *.pdf
+*.jpg
+*.png
+*.jpeg

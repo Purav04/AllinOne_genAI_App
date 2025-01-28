@@ -1,3 +1,3 @@
-version: 1.2.1
+version: 1.3.0
 
-message: indetation correcton in app.py. lines 197 to 202
+message: implemented image segment. started buiding audion segment.

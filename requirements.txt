@@ -8,3 +8,5 @@ langchain_chroma
 langchain_huggingface
 pypdf
 gTTS
+pytesseract
+Pillow
