@@ -19,7 +19,7 @@ import pytesseract
 import streamlit as st
 # from gtts import gTTS
 # import tempfile
-
+os.system("sudo apt-get install tesseract-ocr")
 ###
 
 # def Speak(text_to_speak):
