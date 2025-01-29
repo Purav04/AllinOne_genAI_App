@@ -8,7 +8,6 @@ langchain_chroma
 langchain_huggingface
 pypdf
 pytesseract
-apt-get pytesseract-ocr
 Pillow
 gTTS
 speechrecognition
