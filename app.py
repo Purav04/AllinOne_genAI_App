@@ -15,11 +15,14 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 from PIL import Image
 import pytesseract
+import speech_recognition as sr
+import io
+from gtts import gTTS
 
 import streamlit as st
 # from gtts import gTTS
 # import tempfile
-os.system("sudo apt-get install tesseract-ocr")
+
 ###
 
 # def Speak(text_to_speak):
@@ -76,7 +79,6 @@ def get_image_retrieval(file, file_type, llm):
     return qa_chain
 
 
-
 def get_document_retrieval(file, file_type, llm):
     # get embeddings
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -124,6 +126,45 @@ def get_document_retrieval(file, file_type, llm):
     
     return qa
 
+# Function to transcribe audio using SpeechRecognition with the 'google' engine
+def get_audio_text(audio_file):
+    try:
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(audio_file) as source:
+            audio_data = recognizer.record(source)
+
+        text = recognizer.recognize_google(audio_data)
+        return text
+
+    except sr.UnknownValueError as e:
+        st.warning("Google Speech Recognition could not understand audio")
+        print(f"error: {e}")
+        return None
+    except sr.RequestError as e:
+        st.error(f"Could not request results from Google Speech Recognition service; {e}")
+        return None
+    
+def text_to_speech(text, lang='en'):
+    """
+    Converts text to speech using gTTS.
+
+    Args:
+        text: The text to be converted to speech.
+        lang: The language code for the output speech (default: 'en').
+
+    Returns:
+        A base64 encoded string of the audio data.
+    """
+    try:
+        tts = gTTS(text=text, lang=lang)
+        audio_file = io.BytesIO()
+        tts.write_to_fp(audio_file)
+        audio_file.seek(0)
+        
+        return audio_file
+    except Exception as e:
+        st.error(f"Error converting text to speech: {e}")
+        return None
 
 def text_QnA():
     # selection of Framework
@@ -262,8 +303,37 @@ def text_retriever_image():
 
     return response
 
-def get_translated_text(audio):
-    return
+def audio_translation():
+    lang =  {'af': 'Afrikaans', 'am': 'Amharic', 'ar': 'Arabic', 'bg': 'Bulgarian', 'bn': 'Bengali', 'bs': 'Bosnian', 'ca': 'Catalan', 'cs': 'Czech', 'cy': 'Welsh', 'da': 'Danish', 'de': 'German', 'el': 'Greek', 'en': 'English', 'es': 'Spanish', 'et': 'Estonian', 'eu': 'Basque', 'fi': 'Finnish', 'fr': 'French', 'fr-CA': 'French (Canada)', 'gl': 'Galician', 'gu': 'Gujarati', 'ha': 'Hausa', 'hi': 'Hindi', 'hr': 'Croatian', 'hu': 'Hungarian', 'id': 'Indonesian', 'is': 'Icelandic', 'it': 'Italian', 'iw': 'Hebrew', 'ja': 'Japanese', 'jw': 'Javanese', 'km': 'Khmer', 'kn': 'Kannada', 'ko': 'Korean', 'la': 'Latin', 'lt': 'Lithuanian', 'lv': 'Latvian', 'ml': 'Malayalam', 'mr': 'Marathi', 'ms': 'Malay', 'my': 'Myanmar (Burmese)', 'ne': 'Nepali', 'nl': 'Dutch', 'no': 'Norwegian', 'pa': 'Punjabi (Gurmukhi)', 'pl': 'Polish', 'pt': 'Portuguese (Brazil)', 'pt-PT': 'Portuguese (Portugal)', 'ro': 'Romanian', 'ru': 'Russian', 'si': 'Sinhala', 'sk': 'Slovak', 'sq': 'Albanian', 'sr': 'Serbian', 'su': 'Sundanese', 'sv': 'Swedish', 'sw': 'Swahili', 'ta': 'Tamil', 'te': 'Telugu', 'th': 'Thai', 'tl': 'Filipino', 'tr': 'Turkish', 'uk': 'Ukrainian', 'ur': 'Urdu', 'vi': 'Vietnamese', 'yue': 'Cantonese', 'zh-CN': 'Chinese (Simplified)', 'zh-TW': 'Chinese (Mandarin/Taiwan)', 'zh': 'Chinese (Mandarin)'}
+
+    # selection of Framework
+    root_framework = st.sidebar.selectbox("Select Framework",
+                                        ("Groq", "Nvidia Nim"))
+    
+    # get required values from side bar
+    # hf_api_key = st.sidebar.text_input("HuggingFace API Key", type="password") # not required
+    groq_api_key = st.sidebar.text_input("Groq API Key", type="password")
+    llm_model = st.sidebar.selectbox("Choose LLM model:", 
+                                    ("llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"))
+
+    input_lang = st.selectbox("Input language: ", (i for i in lang.values()), placeholder="English")
+
+    output_lang = st.selectbox("Output language: ", (i for i in lang.values()), placeholder="Spanish")
+
+    audio_file = st.audio_input("Record a voice message")
+
+    if audio_file:
+        transcript = get_audio_text(audio_file)
+        if transcript:
+            
+            LLM = ChatGroq(model=llm_model, streaming=True, api_key=groq_api_key)
+
+            text_output = LLM.invoke(f"Translate this text {transcript} in {output_lang}. only provide translation").content
+
+            audio_data = text_to_speech(text_output, [k for k,v in lang.items() if v==output_lang][-1])
+
+            return text_output, audio_data    
+    return "", ""
 
 
 
@@ -287,7 +357,6 @@ if root_work == "Text":
         # write response
         st.write(response)
         # st.write_stream(LLM.invoke(input).content)  # not worked, bcz "streamlit.errors.StreamlitAPIException: st.write_stream expects a generator or stream-like object as input not <class 'str'>. Please use st.write instead for this data type."
-        # response = "Hello purav"
         
         # for audio support # we won't build functon right now, when we work for audio then probably tomorrow.
         # if st.button("Speak Answer"):
@@ -318,16 +387,19 @@ elif root_work == "Image":
         # if st.button("Speak Answer"):
         #     Speak(str(response))
         #     st.audio()
+
 elif root_work == "Audio":
     root_application_type = st.sidebar.selectbox("Choose Application type:",
                                                  ("Translation"))
 
     if root_application_type == "Translation":
         
-        # speak in the mic
-        audio = st.audio_input()
+            text_output, audio_data = audio_translation()
+            st.write(text_output)
+            
+            if st.button("speak") and text_output:
+                st.audio(audio_data, format='audio/mp3')
 
-        response = get_translated_text(audio=audio)
 
-        st.write()
+
 

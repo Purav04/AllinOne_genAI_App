@@ -7,6 +7,8 @@ langchain_nvidia_ai_endpoints
 langchain_chroma
 langchain_huggingface
 pypdf
-gTTS
 pytesseract
+apt-get pytesseract-ocr
 Pillow
+gTTS
+speechrecognition
