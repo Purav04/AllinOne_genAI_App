@@ -22,7 +22,7 @@ from gtts import gTTS
 import streamlit as st
 # from gtts import gTTS
 # import tempfile
-os.system("apt-get install tesseract-ocr")
+# os.system("apt-get install tesseract-ocr")
 ###
 
 # def Speak(text_to_speak):
