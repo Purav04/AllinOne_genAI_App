@@ -1,7 +1,9 @@
 
 # folder
 logs/
-*_vectores/
+*_vectorestore/
+__*__/
+temp/
 
 # environments
 .env

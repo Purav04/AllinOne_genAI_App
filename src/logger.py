@@ -1,4 +1,5 @@
 import logging
+from logging import handlers
 from datetime import datetime
 import os
 
@@ -13,8 +14,11 @@ os.makedirs(log_path, exist_ok=True)
 log_file_path = os.path.join(log_path, log_file_name)
 
 # creating object
-logging.basicConfig(
-    filename = log_file_path,
-    format = "[ %(asctime)s ] Line Number: %(lineno)d in %(name)s - %(levelname)s - %(message)s",
-    level = "INFO"
-)
+logger = logging.getLogger()
+
+if not logger.hasHandlers():  
+    formatter = logging.Formatter("[ %(asctime)s ] Line Number: %(lineno)d in %(name)s - %(levelname)s - %(message)s")
+    handler = handlers.TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=2)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel("INFO")
