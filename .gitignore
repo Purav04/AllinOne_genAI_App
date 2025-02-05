@@ -2,6 +2,7 @@
 # folder
 logs/
 *_vectorestore/
+__*__/
 temp/
 
 # environments
