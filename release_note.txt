@@ -1,3 +1,4 @@
-version: 1.5.0
+version: 1.6.0
 
-message: converted code to OOPs concepts.
+message: handle exception. based on exception, give personalized warnings,
+         add sidebar for temperature, max_tokens

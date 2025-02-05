@@ -2,7 +2,8 @@ from langchain_groq import ChatGroq
 
 import streamlit as st
 
-
+import sys
+from src.exception import CustomException
 
 class Question_Answer():
     def __init__(self):
@@ -23,13 +24,18 @@ class Question_Answer():
     def ask_groq(self):
         # model
         llm_model = st.sidebar.selectbox("Choose LLM model:", 
-                                        ("llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"))
+                                    ("llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"))
+        tempereature = st.sidebar.slider("Temperature", 0.0, 1.0, step=0.1, value=0.5)
+        max_tokens = st.sidebar.slider("Max Number of Tokens", 128, 1024, step=128, value=1024)
 
-
-        # Asking Question
-        if st.button("Ask Question"):
-            # add LLM model
-            LLM = ChatGroq(model=llm_model, streaming=True, api_key=self.api_key)
+        if self.api_key:
+            try:
+                LLM = ChatGroq(model=llm_model, streaming=True, api_key=self.api_key, 
+                                   temperature=tempereature, max_tokens=max_tokens)
+            except Exception as e:
+                st.error(f"got error")
+                CustomException(e, sys)
+                return ""
 
             # Get response
             response = LLM.invoke(self.input)

@@ -11,6 +11,9 @@ import pytesseract
 import streamlit as st
 import os
 
+import sys
+from src.exception import CustomException
+
 class InfoRetriever():
     def __init__(self):
         # selection of Framework
@@ -36,9 +39,14 @@ class InfoRetriever():
         # get embeddings
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-        # get info from image
-        image = Image.open(file)
-        text_data = pytesseract.image_to_string(image).lower()
+        try:
+            # get info from image
+            image = Image.open(file)
+            text_data = pytesseract.image_to_string(image).lower()
+        except Exception as e:
+            st.error(f"got error")
+            CustomException(e, sys)
+            return
 
 
         # Create a Chroma vector database and populate it
@@ -79,10 +87,18 @@ class InfoRetriever():
         # select LLM models
         llm_model = st.sidebar.selectbox("Choose LLM model:", 
                                     ("llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"))
-        
-        if self.api_key:
-            LLM = ChatGroq(model=llm_model, streaming=True, api_key=self.api_key)
+        tempereature = st.sidebar.slider("Temperature", 0.0, 1.0, step=0.1, value=0.5)
+        max_tokens = st.sidebar.slider("Max Number of Tokens", 128, 1024, step=128, value=1024)
 
+        if self.api_key:
+            try:
+                LLM = ChatGroq(model=llm_model, streaming=True, api_key=self.api_key, 
+                                   temperature=tempereature, max_tokens=max_tokens)
+            except Exception as e:
+                st.error(f"got error")
+                CustomException(e, sys)
+                return ""
+            s
             if self.uploader_file:
                 # add temp file
                 temp_pdf_path = f"{__file__.rsplit('/', maxsplit=3)[0]}/temp/temp_{self.uploader_file.name}"
@@ -93,6 +109,9 @@ class InfoRetriever():
                 # get retrieval
                 retrieval = self.get_groq_image_retrieval(file=temp_pdf_path, file_type=temp_pdf_path.rsplit(".")[-1], llm=LLM)
                 
+                if retrieval == None:
+                    return ""
+
                 if self.ask_button and len(self.input)>0:
                     response = retrieval.invoke({"query": self.input})
                     response = response["result"]

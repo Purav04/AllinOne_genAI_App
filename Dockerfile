@@ -1,8 +1,8 @@
 FROM python:3.9-slim-buster
 
-RUN apt-get install tesseract-ocr
-
 WORKDIR /home/user/app
+
+RUN apt-get install tesseract-ocr
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
