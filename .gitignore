@@ -4,6 +4,8 @@ logs/
 *_vectorestore/
 __*__/
 temp/
+src/image_input/*
+cache_db/
 
 # environments
 .env
@@ -15,3 +17,4 @@ experiment.py
 *.jpg
 *.png
 *.jpeg
+cache*

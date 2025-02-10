@@ -88,7 +88,7 @@ st.title("Ask Question to LLM")
 
 # option to user what he wants to do
 root_work = st.sidebar.selectbox("Choose Input Data Type:",
-                                 ("Text", "Image", "Document", "Audio"))
+                                 ("Text", "Document", "Audio"))
 logger.info(f"Selected Input Data Type: {root_work}")
 
 if root_work == "Text":
@@ -101,7 +101,7 @@ if root_work == "Text":
         # response = text_QnA()
         try:
             response = Question_Answer().run()
-
+            
             # write response
             st.write(response)
         except Exception as e:
@@ -113,26 +113,26 @@ if root_work == "Text":
         #     Speak(str(response))
         #     st.audio()
 
-elif root_work == "Image":
-    root_application_type = st.sidebar.selectbox("Choose Application type:",
-                                                 ("Info Retrieved from Image"))
+# elif root_work == "Image":
+#     root_application_type = st.sidebar.selectbox("Choose Application type:",
+#                                                  ("Info Retrieved from Image"))
 
-    if root_application_type == "Info Retrieved from Image":
-        try:
-            # call function and get response
-            response = Image_InfoRetriever().run()
+#     if root_application_type == "Info Retrieved from Image":
+#         try:
+#             # call function and get response
+#             response = Image_InfoRetriever().run()
 
-            # write response
-            st.write(response)
-        except Exception as e:
-            CustomException(e, sys)
-        # st.write_stream(LLM.invoke(input).content)  # not worked, bcz "streamlit.errors.StreamlitAPIException: st.write_stream expects a generator or stream-like object as input not <class 'str'>. Please use st.write instead for this data type."
-        # response = "Hello purav"
+#             # write response
+#             st.write(response)
+#         except Exception as e:
+#             CustomException(e, sys)
+#         # st.write_stream(LLM.invoke(input).content)  # not worked, bcz "streamlit.errors.StreamlitAPIException: st.write_stream expects a generator or stream-like object as input not <class 'str'>. Please use st.write instead for this data type."
+#         # response = "Hello purav"
         
-        # for audio support # we won't build functon right now, when we work for audio then probably tomorrow.
-        # if st.button("Speak Answer"):
-        #     Speak(str(response))
-        #     st.audio()
+#         # for audio support # we won't build functon right now, when we work for audio then probably tomorrow.
+#         # if st.button("Speak Answer"):
+#         #     Speak(str(response))
+#         #     st.audio()
 
 elif root_work == "Document":
     root_application_type = st.sidebar.selectbox("Choose Application type:",
