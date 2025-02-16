@@ -13,11 +13,13 @@ import speech_recognition as sr
 from gtts import gTTS
 import io
 from datetime import datetime
+from dataclasses import dataclass
 
 import sys, os
 from src.exception import CustomException
 from src.utils import create_cache_table, get_cache, get_table_size, set_cache, check_file_exist
 
+@dataclass
 class Translator():
     def __init__(self):
         self.list_models_groq = ["llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"]
@@ -73,7 +75,7 @@ class Translator():
         if self.allow_caching == "Yes":
             self.db_file_name = f"cache_db/cache_{datetime.now().strftime('%Y-%m-%d')}.db"
             if not check_file_exist(file_name=self.db_file_name, path=os.path.join(os.getcwd(), "cache_db") ):
-                create_cache_table(database_file_name=f"cache_db/{self.db_file_name}")
+                create_cache_table(database_file_name=self.db_file_name)
         
 
     def text_to_speech(self, text, lang):

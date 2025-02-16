@@ -17,11 +17,13 @@ from llama_index.llms.mistralai import MistralAI
 import streamlit as st
 import os
 from datetime import datetime
+from dataclasses import dataclass
 
 import sys
 from src.exception import CustomException
 from src.utils import create_cache_table, get_cache, get_table_size, set_cache, check_file_exist
 
+@dataclass
 class InfoRetriever():
     def __init__(self):
 
@@ -76,7 +78,7 @@ class InfoRetriever():
         if self.allow_caching == "Yes":
             self.db_file_name = f"cache_db/cache_{datetime.now().strftime('%Y-%m-%d')}.db"
             if not check_file_exist(file_name=self.db_file_name, path=os.path.join(os.getcwd(), "cache_db") ):
-                create_cache_table(database_file_name=f"cache_db/{self.db_file_name}")
+                create_cache_table(database_file_name=self.db_file_name)
 
 
     def get_document_retrieval(self, file, file_type, llm):
